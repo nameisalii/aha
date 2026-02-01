@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Redirecting...</title>
+    <script>
+        // GitHub Pages SPA 404 redirect
+        sessionStorage.redirect = location.href;
+        location.replace(location.pathname.split('/').slice(0, 2).join('/') + '/#/' + location.pathname.split('/').slice(2).join('/') + location.search + location.hash);
+    </script>
+</head>
+
+<body>
+    <p>Redirecting...</p>
+</body>
+
+</html>

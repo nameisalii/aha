@@ -3,7 +3,7 @@ import React from 'react';
 export default function AhaLogo({ style, className }) {
     return (
         <img
-            src="/aha_logo_yellow.jpg"
+            src={`${import.meta.env.BASE_URL}aha-logo.png`}
             alt="AHA!"
             style={{
                 ...style,
