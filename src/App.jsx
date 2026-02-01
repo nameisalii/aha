@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, Navigate, Outlet } from 'react-router-dom';
+import { HashRouter, Routes, Route, Navigate, Outlet } from 'react-router-dom';
 import { AppProvider, useApp } from './context/AppContext';
 import Header from './components/Header';
 import BottomNav from './components/BottomNav';
@@ -71,12 +71,12 @@ function AppRoutes() {
 
 export default function App() {
   return (
-    <BrowserRouter>
+    <HashRouter>
       <AppProvider>
         <div className="app-container">
           <AppRoutes />
         </div>
       </AppProvider>
-    </BrowserRouter>
+    </HashRouter>
   );
 }
