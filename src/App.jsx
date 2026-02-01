@@ -1,13 +1,16 @@
 import { BrowserRouter, Routes, Route, Navigate, Outlet } from 'react-router-dom';
 import { AppProvider, useApp } from './context/AppContext';
 import Header from './components/Header';
+import BottomNav from './components/BottomNav';
 import Toast from './components/Toast';
 import LoginPage from './pages/LoginPage';
 import SignupPage from './pages/SignupPage';
-import ShopPage from './pages/ShopPage';
+import RunPage from './pages/RunPage';
+import RidePage from './pages/RidePage';
+import ReusePage from './pages/ReusePage';
+import RewardsPage from './pages/RewardsPage';
 import PublishPage from './pages/PublishPage';
 import ChatPage from './pages/ChatPage';
-import AccountPage from './pages/AccountPage';
 
 function ProtectedRoute() {
   const { currentUser } = useApp();
@@ -19,7 +22,10 @@ function ProtectedRoute() {
   return (
     <>
       <Header />
-      <Outlet />
+      <main className="main-content">
+        <Outlet />
+      </main>
+      <BottomNav />
     </>
   );
 }
@@ -28,7 +34,7 @@ function PublicRoute() {
   const { currentUser } = useApp();
 
   if (currentUser) {
-    return <Navigate to="/shop" replace />;
+    return <Navigate to="/run" replace />;
   }
 
   return <Outlet />;
@@ -46,15 +52,17 @@ function AppRoutes() {
 
         {/* Protected Routes */}
         <Route element={<ProtectedRoute />}>
-          <Route path="/shop" element={<ShopPage />} />
+          <Route path="/run" element={<RunPage />} />
+          <Route path="/ride" element={<RidePage />} />
+          <Route path="/reuse" element={<ReusePage />} />
+          <Route path="/rewards" element={<RewardsPage />} />
           <Route path="/publish" element={<PublishPage />} />
           <Route path="/chat" element={<ChatPage />} />
           <Route path="/chat/:chatId" element={<ChatPage />} />
-          <Route path="/account" element={<AccountPage />} />
         </Route>
 
         {/* Default */}
-        <Route path="*" element={<Navigate to="/shop" replace />} />
+        <Route path="*" element={<Navigate to="/run" replace />} />
       </Routes>
       <Toast />
     </>

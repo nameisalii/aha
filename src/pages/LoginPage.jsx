@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useApp } from '../context/AppContext';
-import { LeafIcon } from '../components/Icons';
+import AhaLogo from '../components/AhaLogo';
 
 export default function LoginPage() {
     const navigate = useNavigate();
@@ -30,9 +30,9 @@ export default function LoginPage() {
             <div className="auth-card">
                 <div className="auth-header">
                     <div className="auth-logo">
-                        <img src="/logo.png" alt="AHA!" style={{ height: '50px', marginBottom: '8px' }} />
+                        <AhaLogo style={{ height: '180px', width: 'auto' }} />
                     </div>
-                    <p className="auth-subtitle">Anyone Has A... Sustainable Student Marketplace</p>
+                    <p className="auth-subtitle">Sustainable Student Marketplace</p>
                 </div>
 
                 <form className="auth-form" onSubmit={handleSubmit}>

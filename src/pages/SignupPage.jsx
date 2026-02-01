@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useApp } from '../context/AppContext';
+import AhaLogo from '../components/AhaLogo';
 
 export default function SignupPage() {
     const navigate = useNavigate();
@@ -35,7 +36,7 @@ export default function SignupPage() {
             <div className="auth-card">
                 <div className="auth-header">
                     <div className="auth-logo">
-                        <img src="/logo.png" alt="AHA!" style={{ height: '50px', marginBottom: '8px' }} />
+                        <AhaLogo style={{ height: '180px', width: 'auto' }} />
                     </div>
                     <p className="auth-subtitle">Join the Sustainable Community</p>
                 </div>

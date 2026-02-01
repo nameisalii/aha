@@ -1,16 +1,33 @@
-import { useState, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState, useRef, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useApp } from '../context/AppContext';
 import { ImageIcon, CloseIcon } from '../components/Icons';
 
 export default function PublishPage() {
     const navigate = useNavigate();
+    const location = useLocation();
     const { createListing } = useApp();
     const fileInputRef = useRef(null);
 
-    const [form, setForm] = useState({ title: '', description: '', hashtags: '' });
+    const queryParams = new URLSearchParams(location.search);
+    const category = queryParams.get('category') || 'run';
+
+    const [form, setForm] = useState({
+        title: '',
+        description: '',
+        hashtags: '',
+        type: category === 'reuse' ? 'give' : 'offer',
+        location: ''
+    });
     const [images, setImages] = useState([]);
     const [loading, setLoading] = useState(false);
+
+    useEffect(() => {
+        setForm(prev => ({
+            ...prev,
+            type: category === 'reuse' ? 'give' : (category === 'ride' ? 'request' : 'offer')
+        }));
+    }, [category]);
 
     const handleImageUpload = (e) => {
         const files = Array.from(e.target.files);
@@ -29,96 +46,101 @@ export default function PublishPage() {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        if (!form.title || !form.description) return;
+        if (!form.title) return;
 
         setLoading(true);
 
         const tags = form.hashtags.split(',').map(t => t.trim().replace(/^#/, '')).filter(t => t);
-        const listing = createListing({
+
+        createListing({
+            category,
+            type: form.type,
             title: form.title,
             description: form.description,
+            location: form.location,
             hashtags: tags,
-            images: images.length > 0 ? images : ['https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400'],
+            images: images.length > 0 ? images : undefined,
         });
 
         setTimeout(() => {
-            navigate('/account');
+            navigate(`/${category}`);
         }, 500);
     };
 
+    const getTitle = () => {
+        switch (category) {
+            case 'run': return 'New Run Request';
+            case 'ride': return 'Request a Ride';
+            case 'reuse': return 'Share / Lend Item';
+            default: return 'Publish Item';
+        }
+    };
+
     return (
-        <div className="main-content">
-            <div className="container page-padding" style={{ maxWidth: '600px' }}>
-                <div style={{ textAlign: 'center', marginBottom: '32px' }}>
-                    <h1 className="heading-2">Publish Item</h1>
-                    <p className="text-muted">Give your item a new home</p>
+        <div className="container" style={{ paddingBottom: '100px' }}>
+            {/* Tabs */}
+            <div className="tabs-container" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', padding: '16px 16px 0' }}>
+                <div style={{ display: 'flex', flex: 1, gap: '8px', background: 'var(--color-primary)', padding: '4px', borderRadius: '8px', maxWidth: '300px' }}>
+                    <button
+                        type="button"
+                        className={`tab-btn ${form.type === 'offer' || form.type === 'give' ? 'active' : ''}`}
+                        onClick={() => setForm({ ...form, type: category === 'reuse' ? 'give' : 'offer' })}
+                        style={{ flex: 1, borderRadius: '6px', fontSize: '12px' }}
+                    >
+                        OFFERS
+                    </button>
+                    <button
+                        type="button"
+                        className={`tab-btn ${form.type === 'request' || form.type === 'lend' ? 'active' : ''}`}
+                        onClick={() => setForm({ ...form, type: category === 'reuse' ? 'lend' : 'request' })}
+                        style={{ flex: 1, borderRadius: '6px', fontSize: '12px' }}
+                    >
+                        REQUESTS
+                    </button>
                 </div>
+            </div>
 
-                <form onSubmit={handleSubmit} className="card" style={{ padding: '32px' }}>
-                    {/* Image Upload */}
-                    <div className="form-group">
-                        <label className="form-label">Photos</label>
-                        <div
-                            className="image-upload"
-                            onClick={() => fileInputRef.current?.click()}
-                        >
-                            <div className="image-upload-icon">
-                                <ImageIcon />
-                            </div>
-                            <p className="image-upload-text">
-                                Click to upload photos
-                            </p>
-                            <p className="text-small text-muted">PNG, JPG up to 10MB</p>
-                        </div>
-                        <input
-                            ref={fileInputRef}
-                            type="file"
-                            accept="image/*"
-                            multiple
-                            onChange={handleImageUpload}
-                            style={{ display: 'none' }}
-                        />
+            <div style={{ textAlign: 'center', margin: '24px 0' }}>
+                <h1 style={{ fontSize: '18px', fontWeight: 'bold', letterSpacing: '0.05em', color: 'var(--color-primary)' }}>CREATE POST</h1>
+                {/* Image 5 shows "CREATE POST" twice, maybe one is a title and one is content? Actually I'll just put it once centered */}
+            </div>
 
-                        {images.length > 0 && (
-                            <div className="image-preview-grid">
-                                {images.map((img, index) => (
-                                    <div key={index} className="image-preview">
-                                        <img src={img} alt={`Upload ${index + 1}`} />
-                                        <button
-                                            type="button"
-                                            className="image-preview-remove"
-                                            onClick={() => removeImage(index)}
-                                        >
-                                            <CloseIcon />
-                                        </button>
-                                    </div>
-                                ))}
-                            </div>
-                        )}
-                    </div>
-
+            <form onSubmit={handleSubmit} style={{ padding: '0 16px' }}>
+                <div className="card" style={{ padding: '24px', background: 'var(--color-surface-soft)', border: '1px solid rgba(0,0,0,0.05)' }}>
                     {/* Title */}
                     <div className="form-group">
-                        <label className="form-label">Title</label>
+                        <label className="form-label">Title / Destination</label>
                         <input
                             type="text"
                             className="form-input"
-                            placeholder="What are you selling?"
+                            placeholder={category === 'run' ? 'e.g. 5k at Duke Forest' : 'e.g. Ride to Target'}
                             value={form.title}
                             onChange={(e) => setForm({ ...form, title: e.target.value })}
                             required
                         />
                     </div>
 
+                    {/* Location */}
+                    <div className="form-group">
+                        <label className="form-label">Meetup Location</label>
+                        <input
+                            type="text"
+                            className="form-input"
+                            placeholder="e.g. Bryan Center, East Campus"
+                            value={form.location}
+                            onChange={(e) => setForm({ ...form, location: e.target.value })}
+                        />
+                    </div>
+
                     {/* Description */}
                     <div className="form-group">
-                        <label className="form-label">Description</label>
+                        <label className="form-label">Notes (Optional)</label>
                         <textarea
                             className="form-input form-textarea"
-                            placeholder="Describe your item... condition, size, why you're selling, etc."
+                            style={{ height: '80px' }}
+                            placeholder="Any additional details..."
                             value={form.description}
                             onChange={(e) => setForm({ ...form, description: e.target.value })}
-                            required
                         />
                     </div>
 
@@ -128,28 +150,21 @@ export default function PublishPage() {
                         <input
                             type="text"
                             className="form-input"
-                            placeholder="e.g. clothes, electronics, books, dorm"
+                            placeholder="e.g. fitness, restaurants"
                             value={form.hashtags}
                             onChange={(e) => setForm({ ...form, hashtags: e.target.value })}
                         />
-                        <p className="text-small text-muted" style={{ marginTop: '4px' }}>
-                            Separate tags with commas
-                        </p>
                     </div>
 
                     <button
                         type="submit"
-                        className="btn btn-primary btn-lg w-full"
-                        disabled={loading || !form.title || !form.description}
+                        className="btn btn-primary btn-lg w-full mt-4"
+                        disabled={loading || !form.title}
                     >
-                        {loading ? 'Publishing...' : '🌱 Publish Item'}
+                        {loading ? 'Posting...' : '🚀 Post to Community'}
                     </button>
-
-                    <p className="text-small text-muted text-center mt-4">
-                        Earn +5 karma points when someone buys this item!
-                    </p>
-                </form>
-            </div>
+                </div>
+            </form>
         </div>
     );
 }
