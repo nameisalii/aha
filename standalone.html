@@ -1,0 +1,1299 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AHA! - Sustainable Student Marketplace</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <style>
+        :root {
+            --color-primary: #2A422D;
+            --color-primary-light: #3D5F41;
+            --color-accent: #F4DB60;
+            --color-background: #FDFBEB;
+            --color-surface: #FDFBEB;
+            --font-family: 'Outfit', sans-serif;
+            --radius-md: 12px;
+            --radius-lg: 20px;
+            --radius-full: 9999px;
+            --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
+            --header-height: 120px;
+            --nav-height: 70px
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0
+        }
+
+        body {
+            font-family: var(--font-family);
+            background: var(--color-background);
+            min-height: 100vh
+        }
+
+        #root {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column
+        }
+
+        .app-container {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            background: var(--color-background)
+        }
+
+        .main-content {
+            flex: 1;
+            padding-top: var(--header-height);
+            padding-bottom: var(--nav-height);
+            width: 100%
+        }
+
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: var(--header-height);
+            background: var(--color-background);
+            z-index: 200;
+            display: flex;
+            align-items: center;
+            justify-content: center
+        }
+
+        .header-inner {
+            width: 100%;
+            max-width: 600px;
+            padding: 0 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center
+        }
+
+        .header-logo {
+            color: var(--color-primary);
+            display: flex;
+            justify-content: center;
+            align-items: center
+        }
+
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: var(--nav-height);
+            background: var(--color-primary);
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+            z-index: 200;
+            border-top-left-radius: var(--radius-lg);
+            border-top-right-radius: var(--radius-lg);
+            padding: 0 16px
+        }
+
+        .bottom-nav-item {
+            color: #fff;
+            font-family: 'Playfair Display', serif;
+            font-style: italic;
+            font-size: 1.125rem;
+            text-decoration: none;
+            opacity: 0.8;
+            transition: all 0.15s;
+            padding: 8px 16px;
+            border-radius: var(--radius-md)
+        }
+
+        .bottom-nav-item.active {
+            opacity: 1;
+            background: var(--color-accent);
+            color: var(--color-primary)
+        }
+
+        .tabs-container {
+            background: var(--color-accent);
+            padding: 16px;
+            margin-bottom: 24px;
+            display: flex;
+            gap: 8px
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 12px;
+            background: transparent;
+            border-radius: var(--radius-md);
+            color: #fff;
+            font-weight: 700;
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            transition: all 0.15s;
+            border: none;
+            cursor: pointer
+        }
+
+        .tab-btn.active {
+            background: #fff;
+            color: var(--color-primary)
+        }
+
+        .tags-scroll {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            padding: 8px 0;
+            margin-top: 8px
+        }
+
+        .tag {
+            white-space: nowrap;
+            padding: 4px 14px;
+            background: #C4A452;
+            color: #fff;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer
+        }
+
+        .tag.active {
+            background: var(--color-primary)
+        }
+
+        .item-bubble {
+            background: #FFF9C4;
+            border-radius: var(--radius-lg);
+            padding: 20px;
+            margin: 0 16px 16px;
+            display: flex;
+            gap: 16px;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            cursor: pointer
+        }
+
+        .item-bubble-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #D9D9D9;
+            flex-shrink: 0
+        }
+
+        .item-bubble-content {
+            flex: 1
+        }
+
+        .item-bubble-name,
+        .item-bubble-target {
+            display: inline-block;
+            font-weight: 600;
+            background: var(--color-primary);
+            color: #fff;
+            padding: 4px 16px;
+            border-radius: 24px;
+            font-size: 13px;
+            margin: 0 4px
+        }
+
+        .item-bubble-time {
+            display: block;
+            font-size: 14px;
+            color: var(--color-primary);
+            margin: 4px 0 16px;
+            padding-left: 4px;
+            font-weight: 500
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 12px 20px;
+            border-radius: var(--radius-full);
+            font-weight: 600;
+            font-size: 0.875rem;
+            transition: all 0.15s;
+            cursor: pointer;
+            border: none
+        }
+
+        .btn-primary {
+            background: var(--color-primary);
+            color: #fff
+        }
+
+        .btn-lg {
+            padding: 16px 32px;
+            font-size: 1rem
+        }
+
+        .w-full {
+            width: 100%
+        }
+
+        .form-group {
+            margin-bottom: 20px
+        }
+
+        .form-label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 8px;
+            color: #1A1A1A
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #EEE;
+            border-radius: var(--radius-md);
+            font-size: 1rem;
+            background: #fff;
+            transition: all 0.15s
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--color-primary)
+        }
+
+        .auth-page {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+            background: var(--color-background)
+        }
+
+        .auth-card {
+            background: var(--color-surface);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-lg);
+            width: 100%;
+            max-width: 440px;
+            overflow: hidden
+        }
+
+        .auth-header {
+            background: var(--color-background);
+            color: var(--color-primary);
+            padding: 32px;
+            text-align: center
+        }
+
+        .auth-logo {
+            font-size: 1.875rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px
+        }
+
+        .auth-subtitle {
+            opacity: 0.9;
+            font-size: 0.875rem
+        }
+
+        .auth-form {
+            padding: 32px
+        }
+
+        .auth-footer {
+            text-align: center;
+            padding: 24px;
+            border-top: 1px solid #EEE;
+            background: #FAFAFA
+        }
+
+        .auth-footer a {
+            color: var(--color-primary);
+            font-weight: 600;
+            cursor: pointer
+        }
+
+        .heading-3 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            line-height: 1.2
+        }
+
+        .mb-6 {
+            margin-bottom: 24px
+        }
+
+        .mt-4 {
+            margin-top: 16px
+        }
+
+        .text-small {
+            font-size: 0.875rem
+        }
+
+        .text-muted {
+            color: #6B7280
+        }
+
+        .text-center {
+            text-align: center
+        }
+
+        .form-error {
+            color: #E53935;
+            font-size: 0.875rem;
+            margin-top: 4px
+        }
+
+        .container {
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 0 16px
+        }
+
+        .tag-filter {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--color-primary);
+            margin-right: 8px
+        }
+
+        .toast-container {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            z-index: 500;
+            display: flex;
+            flex-direction: column;
+            gap: 12px
+        }
+
+        .toast {
+            background: var(--color-surface);
+            border-radius: var(--radius-lg);
+            padding: 16px 20px;
+            box-shadow: var(--shadow-lg);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            min-width: 280px;
+            border-left: 4px solid #43A047
+        }
+
+        .chat-layout {
+            display: grid;
+            grid-template-columns: 320px 1fr;
+            height: calc(100vh - var(--header-height))
+        }
+
+        .chat-sidebar {
+            background: var(--color-surface);
+            border-right: 1px solid #EEE;
+            overflow-y: auto
+        }
+
+        .chat-sidebar-header {
+            padding: 24px;
+            border-bottom: 1px solid #EEE
+        }
+
+        .chat-list {
+            padding: 12px
+        }
+
+        .chat-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            border-radius: var(--radius-lg);
+            cursor: pointer;
+            transition: all 0.15s
+        }
+
+        .chat-item:hover {
+            background: #F5F5F5
+        }
+
+        .chat-item.active {
+            background: rgba(46, 125, 50, 0.1)
+        }
+
+        .chat-item-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: var(--color-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-weight: 700;
+            flex-shrink: 0
+        }
+
+        .chat-item-content {
+            flex: 1;
+            min-width: 0
+        }
+
+        .chat-item-name {
+            font-weight: 600;
+            margin-bottom: 2px
+        }
+
+        .chat-item-preview {
+            color: #6B7280;
+            font-size: 0.875rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis
+        }
+
+        .chat-main {
+            display: flex;
+            flex-direction: column;
+            background: var(--color-background)
+        }
+
+        .chat-main-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 16px 24px;
+            background: var(--color-surface);
+            border-bottom: 1px solid #EEE
+        }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px
+        }
+
+        .chat-message {
+            display: flex;
+            gap: 12px;
+            max-width: 70%
+        }
+
+        .chat-message.sent {
+            align-self: flex-end;
+            flex-direction: row-reverse
+        }
+
+        .chat-message-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: var(--color-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 0.875rem;
+            font-weight: 700;
+            flex-shrink: 0
+        }
+
+        .chat-message-bubble {
+            background: var(--color-surface);
+            padding: 12px 16px;
+            border-radius: var(--radius-lg)
+        }
+
+        .chat-message.sent .chat-message-bubble {
+            background: var(--color-primary);
+            color: #fff
+        }
+
+        .chat-message-time {
+            font-size: 0.75rem;
+            color: #6B7280;
+            margin-top: 4px
+        }
+
+        .chat-message.sent .chat-message-time {
+            text-align: right
+        }
+
+        .chat-input-container {
+            padding: 16px 24px;
+            background: var(--color-surface);
+            border-top: 1px solid #EEE
+        }
+
+        .chat-input-wrapper {
+            display: flex;
+            gap: 12px;
+            align-items: center
+        }
+
+        .chat-input {
+            flex: 1;
+            padding: 12px 16px;
+            border: 2px solid #EEE;
+            border-radius: var(--radius-full);
+            font-size: 1rem;
+            background: #FAFAFA
+        }
+
+        .chat-input:focus {
+            outline: none;
+            border-color: var(--color-primary);
+            background: #fff
+        }
+
+        .chat-empty {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #6B7280;
+            text-align: center;
+            padding: 32px
+        }
+
+        .heading-4 {
+            font-size: 1.25rem;
+            font-weight: 600
+        }
+
+        .card {
+            background: var(--color-surface);
+            border-radius: var(--radius-lg);
+            overflow: hidden
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 2px solid var(--color-primary);
+            color: var(--color-primary)
+        }
+
+        .btn-sm {
+            padding: 8px 12px;
+            font-size: 0.75rem
+        }
+
+        .btn-secondary {
+            background: #F5F5F5;
+            color: #1A1A1A
+        }
+
+        .btn-icon {
+            width: 40px;
+            height: 40px;
+            padding: 0;
+            border-radius: 50%
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 64px 24px;
+            color: #6B7280
+        }
+
+        @media(max-width:768px) {
+            .chat-layout {
+                grid-template-columns: 1fr
+            }
+
+            .chat-sidebar {
+                display: none
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div id="root"></div>
+    <script type="text/babel">
+        const { useState, useEffect, useRef, createContext, useContext } = React;
+
+        // UUID generator
+        const uuidv4 = () => 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
+            const r = Math.random() * 16 | 0;
+            return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
+        });
+
+        // Context
+        const AppContext = createContext();
+
+        const demoUsers = [
+            { id: '1', name: 'Alex Johnson', email: 'alex.johnson@duke.edu', phone: '555-0101', points: 4500, password: 'demo123' },
+            { id: '2', name: 'Sarah Chen', email: 'sarah.chen@duke.edu', phone: '555-0102', points: 3200, password: 'demo123' },
+            { id: '3', name: 'Marcus Williams', email: 'marcus.w@duke.edu', phone: '555-0103', points: 2800, password: 'demo123' },
+            { id: '4', name: 'Emily Rodriguez', email: 'emily.r@duke.edu', phone: '555-0104', points: 1500, password: 'demo123' },
+            { id: '5', name: 'Gudrun', email: 'gudrun@duke.edu', phone: '555-0105', points: 1000, password: 'demo123' },
+            { id: '6', name: 'Kaddy', email: 'kaddy@duke.edu', phone: '555-0106', points: 1200, password: 'demo123' },
+            { id: '7', name: 'Kashvi', email: 'kashvi@duke.edu', phone: '555-0107', points: 1100, password: 'demo123' },
+            { id: '8', name: 'Mad', email: 'mad@duke.edu', phone: '555-0108', points: 900, password: 'demo123' },
+        ];
+
+        const demoListings = [
+            { id: 'r1', category: 'run', type: 'offer', title: 'Naan Stop', sellerId: '5', sellerName: 'Gudrun', status: 'active', hashtags: ['restaurants', 'time-sensitive'], location: 'Naan Stop', timeInfo: '20 min', createdAt: new Date() },
+            { id: 'r2', category: 'run', type: 'offer', title: 'Pizzeria Toro', sellerId: '6', sellerName: 'Kaddy', status: 'active', hashtags: ['restaurants', 'time-sensitive'], location: 'Pizzeria Toro', timeInfo: '1hr 40 min', createdAt: new Date() },
+            { id: 'r3', category: 'run', type: 'offer', title: "Ideal's", sellerId: '7', sellerName: 'Kashvi', status: 'active', hashtags: ['restaurants', 'time-sensitive'], location: "Ideal's", timeInfo: '2hr 30 min', createdAt: new Date() },
+            { id: 'r4', category: 'run', type: 'request', title: 'Whole Foods', sellerId: '1', sellerName: 'Alex', status: 'active', hashtags: ['groceries', 'time-sensitive'], location: 'Whole Foods', timeInfo: 'by 5pm today', createdAt: new Date() },
+            { id: 'rid1', category: 'ride', type: 'offer', title: 'RDU Airport', sellerId: '2', sellerName: 'Sarah', status: 'active', hashtags: ['airport'], location: 'RDU Airport', timeInfo: 'Monday morning', createdAt: new Date() },
+            { id: 'rid2', category: 'ride', type: 'offer', title: 'Southpoint Mall', sellerId: '4', sellerName: 'Emily', status: 'active', hashtags: ['mall'], location: 'Southpoint Mall', timeInfo: 'Saturday 2pm', createdAt: new Date() },
+            { id: 'rid4', category: 'ride', type: 'request', title: 'Duke Campus Farm', sellerId: '5', sellerName: 'Gudrun', status: 'active', hashtags: ['university-event'], location: 'Duke Campus Farm', timeInfo: 'Sunday 2/1, 4pm', createdAt: new Date() },
+            { id: 'reu1', category: 'reuse', type: 'give', title: 'Blue Hoodie', description: 'Size Large, slightly worn but very comfy.', sellerId: '8', sellerName: 'Mad', status: 'active', hashtags: ['clothing'], location: 'West Campus', timeInfo: 'Pickup Tonight', createdAt: new Date() },
+            { id: 'reu2', category: 'reuse', type: 'give', title: 'Calculus Textbook', description: 'Borrow it for the semester!', sellerId: '4', sellerName: 'Emily', status: 'active', hashtags: ['books'], location: 'Student Union', timeInfo: 'Semester-long', createdAt: new Date() },
+            { id: 'reu4', category: 'reuse', type: 'lend', title: 'Winter Jacket', description: 'Size Medium, very warm.', sellerId: '7', sellerName: 'Kashvi', status: 'active', hashtags: ['clothing'], location: 'East Campus', timeInfo: 'Weekly lend', createdAt: new Date() },
+        ];
+
+        function AppProvider({ children }) {
+            const [currentUser, setCurrentUser] = useState(() => {
+                const saved = localStorage.getItem('aha_user');
+                return saved ? JSON.parse(saved) : null;
+            });
+            const [users, setUsers] = useState(demoUsers);
+            const [listings, setListings] = useState(demoListings);
+            const [chats, setChats] = useState([]);
+            const [toasts, setToasts] = useState([]);
+
+            useEffect(() => {
+                if (currentUser) localStorage.setItem('aha_user', JSON.stringify(currentUser));
+                else localStorage.removeItem('aha_user');
+            }, [currentUser]);
+
+            const showToast = (message, type = 'success') => {
+                const id = uuidv4();
+                setToasts(prev => [...prev, { id, message, type }]);
+                setTimeout(() => setToasts(prev => prev.filter(t => t.id !== id)), 4000);
+            };
+
+            const login = (email, password) => {
+                const user = users.find(u => u.email === email && u.password === password);
+                if (user) {
+                    const { password: _, ...safeUser } = user;
+                    setCurrentUser(safeUser);
+                    showToast(`Welcome back, ${user.name}!`);
+                    return { success: true };
+                }
+                return { success: false, error: 'Invalid email or password' };
+            };
+
+            const signup = (userData) => {
+                if (users.some(u => u.email === userData.email)) {
+                    return { success: false, error: 'Email already registered' };
+                }
+                const newUser = { id: uuidv4(), ...userData, points: 1000 };
+                setUsers(prev => [...prev, newUser]);
+                const { password: _, ...safeUser } = newUser;
+                setCurrentUser(safeUser);
+                showToast('Welcome to AHA! +1000 bonus points! 🎉');
+                return { success: true };
+            };
+
+            const logout = () => { setCurrentUser(null); showToast('Logged out'); };
+
+            const createListing = (data) => {
+                const listing = { id: uuidv4(), ...data, sellerId: currentUser.id, sellerName: currentUser.name, status: 'active', createdAt: new Date() };
+                setListings(prev => [listing, ...prev]);
+                showToast('Published successfully! 🌱');
+                return listing;
+            };
+
+            const startChat = (targetId, listingId) => {
+                if (!currentUser) return null;
+                let chat = chats.find(c => c.listingId === listingId && ((c.buyerId === currentUser.id && c.sellerId === targetId) || (c.sellerId === currentUser.id && c.buyerId === targetId)));
+                if (chat) return chat.id;
+                const listing = listings.find(l => l.id === listingId);
+                const seller = users.find(u => u.id === targetId);
+                const newChat = { id: uuidv4(), listingId, listingTitle: listing?.title || 'Request', sellerId: targetId, sellerName: seller?.name, buyerId: currentUser.id, buyerName: currentUser.name, messages: [], createdAt: new Date() };
+                setChats(prev => [newChat, ...prev]);
+                return newChat.id;
+            };
+
+            const sendMessage = (chatId, content) => {
+                const msg = { id: uuidv4(), senderId: currentUser.id, senderName: currentUser.name, content, timestamp: new Date() };
+                setChats(prev => prev.map(c => c.id === chatId ? { ...c, messages: [...c.messages, msg], lastMessage: content, lastMessageAt: new Date() } : c));
+            };
+
+            const getUserChats = () => currentUser ? chats.filter(c => c.buyerId === currentUser.id || c.sellerId === currentUser.id).sort((a, b) => new Date(b.lastMessageAt || b.createdAt) - new Date(a.lastMessageAt || a.createdAt)) : [];
+
+            return (
+                <AppContext.Provider value={{ currentUser, users, listings, chats, toasts, login, signup, logout, createListing, startChat, sendMessage, getUserChats, showToast }}>
+                    {children}
+                </AppContext.Provider>
+            );
+        }
+
+        const useApp = () => useContext(AppContext);
+
+        // Icons
+        const ChatIcon = () => <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" /></svg>;
+        const SendIcon = () => <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="22" y1="2" x2="11" y2="13" /><polygon points="22 2 15 22 11 13 2 9 22 2" /></svg>;
+        const CheckIcon = () => <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12" /></svg>;
+
+        // Logo Component
+        function AhaLogo({ style }) {
+            return <div style={{ fontSize: '48px', fontWeight: 'bold', color: 'var(--color-primary)', ...style }}>AHA!</div>;
+        }
+
+        // Toast Component
+        function Toast() {
+            const { toasts } = useApp();
+            if (toasts.length === 0) return null;
+            return (
+                <div className="toast-container">
+                    {toasts.map(toast => (
+                        <div key={toast.id} className="toast">
+                            <span style={{ width: 24, height: 24, color: '#43A047' }}><CheckIcon /></span>
+                            <span>{toast.message}</span>
+                        </div>
+                    ))}
+                </div>
+            );
+        }
+
+        // Header Component
+        function Header() {
+            const { setPage } = useApp();
+            return (
+                <header className="header">
+                    <div className="header-inner">
+                        <div className="header-logo" onClick={() => window.location.hash = '#/run'} style={{ cursor: 'pointer' }}>
+                            <AhaLogo style={{ height: '80px' }} />
+                        </div>
+                    </div>
+                </header>
+            );
+        }
+
+        // BottomNav Component
+        function BottomNav({ currentPage }) {
+            const items = [
+                { path: 'run', label: 'run' },
+                { path: 'ride', label: 'ride' },
+                { path: 'reuse', label: 'reuse' },
+                { path: 'rewards', label: 'rewards' },
+            ];
+
+            return (
+                <nav className="bottom-nav">
+                    {items.map(({ path, label }) => (
+                        <a key={path} href={`#/${path}`} className={`bottom-nav-item ${currentPage === path ? 'active' : ''}`}>
+                            <span className="bottom-nav-label">{label}</span>
+                        </a>
+                    ))}
+                </nav>
+            );
+        }
+
+        // ItemCard Component
+        function ItemCard({ item, onTagClick }) {
+            const { currentUser, startChat } = useApp();
+
+            const handleClick = () => {
+                if (!currentUser) {
+                    window.location.hash = '#/login';
+                    return;
+                }
+                if (currentUser.id !== item.sellerId) {
+                    const chatId = startChat(item.sellerId, item.id);
+                    if (chatId) window.location.hash = `#/chat/${chatId}`;
+                }
+            };
+
+            return (
+                <div className="item-bubble" onClick={handleClick}>
+                    <div className="item-bubble-avatar"></div>
+                    <div className="item-bubble-content">
+                        <div style={{ fontSize: '15px', color: 'var(--color-primary)', display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap', lineHeight: '1.2' }}>
+                            <span className="item-bubble-name">{item.sellerName || 'Someone'}</span>
+                            <span style={{ fontWeight: '500', color: 'var(--color-primary)' }}>
+                                {item.category === 'run' ? (item.type === 'request' ? 'is anybody going to' : 'is going to') :
+                                    item.category === 'ride' ? (item.type === 'offer' ? 'is offering a ride share to' : 'is requesting a ride share to') : 'is offering'}
+                            </span>
+                            <span className="item-bubble-target">{item.category === 'reuse' ? item.title : (item.location || item.title)}</span>
+                        </div>
+                        {item.category === 'reuse' && <div style={{ fontSize: '14px', color: 'var(--color-primary)', fontWeight: '500', marginTop: '2px', paddingLeft: '4px' }}>at {item.location}</div>}
+                        <div className="item-bubble-time">{item.timeInfo || 'Recently'}</div>
+                        {item.description && item.category !== 'run' && <div style={{ fontSize: '13px', color: 'var(--color-primary)', marginBottom: '16px', opacity: 0.8, paddingLeft: '4px' }}>{item.description}</div>}
+                        <div className="tags-scroll">
+                            {item.hashtags?.map((tag, i) => (
+                                <span key={i} className="tag active" onClick={(e) => { e.stopPropagation(); onTagClick?.(`#${tag}`); }} style={{ background: '#D4B860', color: 'white', fontSize: '11px', fontWeight: 'bold', padding: '4px 12px', borderRadius: '20px' }}>
+                                    #{tag}
+                                </span>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+
+        // Login Page
+        function LoginPage() {
+            const { login } = useApp();
+            const [form, setForm] = useState({ email: '', password: '' });
+            const [error, setError] = useState('');
+            const [loading, setLoading] = useState(false);
+
+            const handleSubmit = (e) => {
+                e.preventDefault();
+                setError('');
+                setLoading(true);
+                const result = login(form.email, form.password);
+                if (result.success) {
+                    window.location.hash = '#/run';
+                } else {
+                    setError(result.error);
+                }
+                setLoading(false);
+            };
+
+            return (
+                <div className="auth-page">
+                    <div className="auth-card">
+                        <div className="auth-header">
+                            <div className="auth-logo"><AhaLogo /></div>
+                            <p className="auth-subtitle">Sustainable Student Marketplace</p>
+                        </div>
+                        <form className="auth-form" onSubmit={handleSubmit}>
+                            <h2 className="heading-3 mb-6">Welcome Back</h2>
+                            {error && <div className="form-error mb-4" style={{ padding: '12px', background: 'rgba(229, 57, 53, 0.1)', borderRadius: '8px' }}>{error}</div>}
+                            <div className="form-group">
+                                <label className="form-label">Email</label>
+                                <input type="email" className="form-input" placeholder="your.email@duke.edu" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} required />
+                            </div>
+                            <div className="form-group">
+                                <label className="form-label">Password</label>
+                                <input type="password" className="form-input" placeholder="Enter your password" value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} required />
+                            </div>
+                            <button type="submit" className="btn btn-primary btn-lg w-full" disabled={loading}>{loading ? 'Signing in...' : 'Sign In'}</button>
+                            <p className="text-small text-muted mt-4 text-center">Demo: sarah.chen@duke.edu / demo123</p>
+                        </form>
+                        <div className="auth-footer">Don't have an account? <a onClick={() => window.location.hash = '#/signup'}>Sign up</a></div>
+                    </div>
+                </div>
+            );
+        }
+
+        // Signup Page
+        function SignupPage() {
+            const { signup } = useApp();
+            const [form, setForm] = useState({ name: '', email: '', phone: '', password: '' });
+            const [error, setError] = useState('');
+            const [loading, setLoading] = useState(false);
+
+            const handleSubmit = (e) => {
+                e.preventDefault();
+                setError('');
+                setLoading(true);
+                if (!form.name || !form.email || !form.phone || !form.password) {
+                    setError('All fields are required');
+                    setLoading(false);
+                    return;
+                }
+                const result = signup(form);
+                if (result.success) {
+                    window.location.hash = '#/run';
+                } else {
+                    setError(result.error);
+                }
+                setLoading(false);
+            };
+
+            return (
+                <div className="auth-page">
+                    <div className="auth-card">
+                        <div className="auth-header">
+                            <div className="auth-logo"><AhaLogo /></div>
+                            <p className="auth-subtitle">Join the Sustainable Community</p>
+                        </div>
+                        <form className="auth-form" onSubmit={handleSubmit}>
+                            <h2 className="heading-3 mb-6">Create Account</h2>
+                            {error && <div className="form-error mb-4" style={{ padding: '12px', background: 'rgba(229, 57, 53, 0.1)', borderRadius: '8px' }}>{error}</div>}
+                            <div className="form-group">
+                                <label className="form-label">Full Name</label>
+                                <input type="text" className="form-input" placeholder="Your full name" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required />
+                            </div>
+                            <div className="form-group">
+                                <label className="form-label">Email</label>
+                                <input type="email" className="form-input" placeholder="your.email@duke.edu" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} required />
+                            </div>
+                            <div className="form-group">
+                                <label className="form-label">Phone Number</label>
+                                <input type="tel" className="form-input" placeholder="555-123-4567" value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} required />
+                            </div>
+                            <div className="form-group">
+                                <label className="form-label">Password</label>
+                                <input type="password" className="form-input" placeholder="Create a password" value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} required />
+                            </div>
+                            <button type="submit" className="btn btn-primary btn-lg w-full" disabled={loading}>{loading ? 'Creating account...' : 'Create Account'}</button>
+                            <p className="text-small text-muted mt-4 text-center">By signing up, you agree to help make Duke more sustainable! 🌱</p>
+                        </form>
+                        <div className="auth-footer">Already have an account? <a onClick={() => window.location.hash = '#/login'}>Sign in</a></div>
+                    </div>
+                </div>
+            );
+        }
+
+        // RunPage
+        function RunPage() {
+            const { listings } = useApp();
+            const [activeTab, setActiveTab] = useState('OFFERS');
+            const [search, setSearch] = useState('');
+
+            const runListings = listings.filter(l => l.category === 'run' && l.status === 'active');
+            const filteredListings = runListings.filter(item => {
+                if (activeTab === 'OFFERS' && item.type !== 'offer') return false;
+                if (activeTab === 'REQUESTS' && item.type !== 'request') return false;
+                if (!search.trim()) return true;
+                const tagMatch = item.hashtags?.some(t => `#${t.toLowerCase()}` === search.toLowerCase() || t.toLowerCase() === search.toLowerCase());
+                return item.title.toLowerCase().includes(search.toLowerCase()) || item.location?.toLowerCase().includes(search.toLowerCase()) || tagMatch;
+            });
+
+            const hashtags = ['#restaurants', '#time-sensitive', '#groceries', '#coffee', '#bakery'];
+
+            return (
+                <div className="container" style={{ paddingBottom: '100px' }}>
+                    <div className="tabs-container" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px', padding: '0 16px', background: 'var(--color-accent)' }}>
+                        <div style={{ display: 'flex', flex: 1, gap: '4px', background: 'var(--color-primary)', padding: '6px', borderRadius: '12px' }}>
+                            <button className={`tab-btn ${activeTab === 'OFFERS' ? 'active' : ''}`} onClick={() => setActiveTab('OFFERS')} style={{ flex: 1, borderRadius: '8px', fontSize: '12px', border: 'none' }}>OFFERS</button>
+                            <button className={`tab-btn ${activeTab === 'REQUESTS' ? 'active' : ''}`} onClick={() => setActiveTab('REQUESTS')} style={{ flex: 1, borderRadius: '8px', fontSize: '12px', border: 'none' }}>REQUESTS</button>
+                        </div>
+                        <a href="#/chat" style={{ color: 'var(--color-primary)', display: 'flex', fontSize: '24px', padding: '8px' }}>
+                            <div style={{ background: '#F4DB60', borderRadius: '4px', padding: '4px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><ChatIcon /></div>
+                        </a>
+                    </div>
+                    <div style={{ padding: '0 16px', marginTop: '16px' }}>
+                        <div className="tag-filter" style={{ fontSize: '11px', fontWeight: 'bold' }}>FILTER BY:</div>
+                        <div className="tags-scroll" style={{ marginTop: '4px' }}>
+                            {hashtags.map(tag => (<span key={tag} className={`tag ${search.toLowerCase() === tag.toLowerCase() ? 'active' : ''}`} onClick={() => setSearch(search.toLowerCase() === tag.toLowerCase() ? '' : tag)}>{tag}</span>))}
+                        </div>
+                    </div>
+                    <div style={{ padding: '16px 0' }}>
+                        {filteredListings.length > 0 ? filteredListings.map(item => <ItemCard key={item.id} item={item} onTagClick={setSearch} />) :
+                            <div style={{ textAlign: 'center', padding: '40px', color: 'var(--color-primary-light)' }}><p>No {activeTab.toLowerCase()} found.</p></div>}
+                    </div>
+                    <button onClick={() => window.location.hash = '#/publish?category=run'} style={{ position: 'fixed', bottom: '100px', right: '20px', width: '50px', height: '50px', borderRadius: '50%', background: 'var(--color-accent)', color: 'var(--color-primary)', fontSize: '24px', boxShadow: '0 4px 12px rgba(0,0,0,0.1)', zIndex: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', border: 'none', cursor: 'pointer' }}>+</button>
+                </div>
+            );
+        }
+
+        // RidePage
+        function RidePage() {
+            const { listings } = useApp();
+            const [activeTab, setActiveTab] = useState('OFFERS');
+            const [search, setSearch] = useState('');
+
+            const rideListings = listings.filter(l => l.category === 'ride' && l.status === 'active');
+            const filteredListings = rideListings.filter(item => {
+                if (activeTab === 'OFFERS' && item.type !== 'offer') return false;
+                if (activeTab === 'REQUESTS' && item.type !== 'request') return false;
+                if (!search.trim()) return true;
+                const tagMatch = item.hashtags?.some(t => `#${t.toLowerCase()}` === search.toLowerCase());
+                return item.title.toLowerCase().includes(search.toLowerCase()) || tagMatch;
+            });
+
+            return (
+                <div className="container" style={{ paddingBottom: '100px' }}>
+                    <div className="tabs-container" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px', padding: '0 16px', background: 'var(--color-accent)' }}>
+                        <div style={{ display: 'flex', flex: 1, gap: '4px', background: 'var(--color-primary)', padding: '6px', borderRadius: '12px' }}>
+                            <button className={`tab-btn ${activeTab === 'OFFERS' ? 'active' : ''}`} onClick={() => setActiveTab('OFFERS')} style={{ flex: 1, borderRadius: '8px', fontSize: '12px', border: 'none' }}>OFFERS</button>
+                            <button className={`tab-btn ${activeTab === 'REQUESTS' ? 'active' : ''}`} onClick={() => setActiveTab('REQUESTS')} style={{ flex: 1, borderRadius: '8px', fontSize: '12px', border: 'none' }}>REQUESTS</button>
+                        </div>
+                        <a href="#/chat" style={{ color: 'var(--color-primary)', display: 'flex', fontSize: '24px', padding: '8px' }}><ChatIcon /></a>
+                    </div>
+                    <div className="tag-filter" style={{ fontSize: '11px', fontWeight: 'bold', padding: '16px 16px 0' }}>FILTER BY:</div>
+                    <div className="tags-scroll" style={{ padding: '0 16px' }}>
+                        {['#university-event', '#airport', '#groceries', '#mall'].map(tag => (<span key={tag} className={`tag ${search.toLowerCase() === tag.toLowerCase() ? 'active' : ''}`} onClick={() => setSearch(search.toLowerCase() === tag.toLowerCase() ? '' : tag)}>{tag}</span>))}
+                    </div>
+                    <div style={{ padding: '16px 0' }}>
+                        {filteredListings.length > 0 ? filteredListings.map(item => <ItemCard key={item.id} item={item} onTagClick={setSearch} />) :
+                            <div style={{ textAlign: 'center', padding: '40px', color: 'var(--color-primary-light)' }}><p>No content found.</p></div>}
+                    </div>
+                    <button onClick={() => window.location.hash = '#/publish?category=ride'} style={{ position: 'fixed', bottom: '100px', right: '20px', width: '50px', height: '50px', borderRadius: '50%', background: 'var(--color-accent)', color: 'var(--color-primary)', fontSize: '24px', boxShadow: '0 4px 12px rgba(0,0,0,0.1)', zIndex: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', border: 'none', cursor: 'pointer' }}>+</button>
+                </div>
+            );
+        }
+
+        // ReusePage
+        function ReusePage() {
+            const { listings } = useApp();
+            const [activeTab, setActiveTab] = useState('GIVE');
+            const [search, setSearch] = useState('');
+
+            const reuseListings = listings.filter(l => l.category === 'reuse' && l.status === 'active');
+            const filteredListings = reuseListings.filter(item => {
+                if (activeTab === 'GIVE' && item.type !== 'give') return false;
+                if (activeTab === 'LEND' && item.type !== 'lend') return false;
+                if (!search.trim()) return true;
+                const tagMatch = item.hashtags?.some(t => `#${t.toLowerCase()}` === search.toLowerCase());
+                return item.title.toLowerCase().includes(search.toLowerCase()) || tagMatch;
+            });
+
+            return (
+                <div className="container" style={{ paddingBottom: '100px' }}>
+                    <div className="tabs-container" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '16px', padding: '0 16px', background: 'var(--color-accent)' }}>
+                        <div style={{ display: 'flex', flex: 1, gap: '8px', background: 'var(--color-primary)', padding: '6px', borderRadius: '12px' }}>
+                            <button className={`tab-btn ${activeTab === 'GIVE' ? 'active' : ''}`} onClick={() => setActiveTab('GIVE')} style={{ flex: 1, borderRadius: '8px', fontSize: '12px', border: 'none' }}>FREE / GIVE</button>
+                            <button className={`tab-btn ${activeTab === 'LEND' ? 'active' : ''}`} onClick={() => setActiveTab('LEND')} style={{ flex: 1, borderRadius: '8px', fontSize: '12px', border: 'none' }}>BORROW / LEND</button>
+                        </div>
+                        <a href="#/chat" style={{ color: 'var(--color-primary)', display: 'flex', fontSize: '24px', padding: '8px' }}><ChatIcon /></a>
+                    </div>
+                    <div style={{ padding: '0 16px', margin: '8px 0' }}>
+                        <div className="tag-filter">FIND BY TYPE:</div>
+                        <div className="tags-scroll">
+                            {['#university-event', '#food', '#furniture', '#clothing', '#electronics', '#books'].map(tag => (<span key={tag} className={`tag ${search.toLowerCase() === tag.toLowerCase() ? 'active' : ''}`} onClick={() => setSearch(search.toLowerCase() === tag.toLowerCase() ? '' : tag)}>{tag}</span>))}
+                        </div>
+                    </div>
+                    <div style={{ padding: '0 16px' }}>
+                        {filteredListings.length > 0 ? filteredListings.map(item => <ItemCard key={item.id} item={item} onTagClick={setSearch} />) :
+                            <div style={{ textAlign: 'center', padding: '40px', color: 'var(--color-primary-light)' }}><p>No {activeTab === 'GIVE' ? 'items to give' : 'items to lend'} found.</p></div>}
+                    </div>
+                    <button onClick={() => window.location.hash = '#/publish?category=reuse'} style={{ position: 'fixed', bottom: '100px', right: '24px', width: '56px', height: '56px', borderRadius: '50%', background: 'var(--color-accent)', color: 'var(--color-primary)', fontSize: '24px', boxShadow: 'var(--shadow-lg)', zIndex: 10, border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>+</button>
+                </div>
+            );
+        }
+
+        // RewardsPage
+        function RewardsPage() {
+            const { currentUser, listings, logout } = useApp();
+            const [activeTab, setActiveTab] = useState('REWARDS');
+
+            const rewardListings = listings.filter(l => l.category === 'reuse' && l.status === 'active');
+
+            return (
+                <div className="container" style={{ paddingBottom: '100px' }}>
+                    <div className="tabs-container" style={{ margin: '0', display: 'flex', gap: '8px', padding: '16px' }}>
+                        <button className={`tab-btn ${activeTab === 'REWARDS' ? 'active' : ''}`} onClick={() => setActiveTab('REWARDS')} style={{ flex: 1 }}>MY REWARDS</button>
+                        <button className={`tab-btn ${activeTab === 'ACCOUNT' ? 'active' : ''}`} onClick={() => setActiveTab('ACCOUNT')} style={{ flex: 1 }}>ACCOUNT</button>
+                    </div>
+                    {activeTab === 'REWARDS' ? (
+                        <>
+                            <div style={{ padding: '20px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'var(--color-accent)', margin: '0 0 16px 0' }}>
+                                <div style={{ background: 'var(--color-primary)', color: 'white', padding: '6px 12px', borderRadius: '20px', fontSize: '12px', fontWeight: 'bold' }}>5,000 points</div>
+                                <div style={{ display: 'flex', gap: '4px' }}>{[1, 2, 3, 4, 5].map(i => <span key={i} style={{ fontSize: '18px', color: '#FBC02D' }}>★</span>)}</div>
+                            </div>
+                            <div style={{ padding: '0 16px', marginBottom: '16px' }}>
+                                <div className="tag-filter" style={{ fontSize: '11px', fontWeight: 'bold' }}>FILTER BY:</div>
+                                <div className="tags-scroll" style={{ marginTop: '4px' }}>
+                                    {['#food', '#coffee', '#dessert', '#clothing', '#services'].map(tag => <span key={tag} className="tag active" style={{ background: '#FBC02D', color: 'var(--color-primary)' }}>{tag}</span>)}
+                                </div>
+                            </div>
+                            <div style={{ padding: '0 16px' }}>{rewardListings.map(item => <ItemCard key={item.id} item={item} />)}</div>
+                        </>
+                    ) : (
+                        <div style={{ padding: '16px' }}>
+                            <div className="card" style={{ padding: '24px', background: 'var(--color-surface)' }}>
+                                <h3 style={{ marginBottom: '20px', color: 'var(--color-primary)' }}>Account Info</h3>
+                                <p><strong>Name:</strong> {currentUser?.name}</p>
+                                <p><strong>Email:</strong> {currentUser?.email}</p>
+                                <p><strong>Points:</strong> {currentUser?.points}</p>
+                            </div>
+                            <button className="btn btn-outline w-full mt-4" onClick={() => { logout(); window.location.hash = '#/login'; }} style={{ borderColor: '#E53935', color: '#E53935' }}>Log Out</button>
+                        </div>
+                    )}
+                </div>
+            );
+        }
+
+        // PublishPage
+        function PublishPage() {
+            const { createListing } = useApp();
+            const category = new URLSearchParams(window.location.hash.split('?')[1] || '').get('category') || 'run';
+            const [form, setForm] = useState({ title: '', description: '', hashtags: '', type: category === 'reuse' ? 'give' : 'offer', location: '' });
+            const [loading, setLoading] = useState(false);
+
+            const handleSubmit = (e) => {
+                e.preventDefault();
+                if (!form.title) return;
+                setLoading(true);
+                const tags = form.hashtags.split(',').map(t => t.trim().replace(/^#/, '')).filter(t => t);
+                createListing({ category, type: form.type, title: form.title, description: form.description, location: form.location, hashtags: tags });
+                setTimeout(() => { window.location.hash = `#/${category}`; }, 500);
+            };
+
+            return (
+                <div className="container" style={{ paddingBottom: '100px' }}>
+                    <div className="tabs-container" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', padding: '16px 16px 0' }}>
+                        <div style={{ display: 'flex', flex: 1, gap: '8px', background: 'var(--color-primary)', padding: '4px', borderRadius: '8px', maxWidth: '300px' }}>
+                            <button type="button" className={`tab-btn ${form.type === 'offer' || form.type === 'give' ? 'active' : ''}`} onClick={() => setForm({ ...form, type: category === 'reuse' ? 'give' : 'offer' })} style={{ flex: 1, borderRadius: '6px', fontSize: '12px' }}>OFFERS</button>
+                            <button type="button" className={`tab-btn ${form.type === 'request' || form.type === 'lend' ? 'active' : ''}`} onClick={() => setForm({ ...form, type: category === 'reuse' ? 'lend' : 'request' })} style={{ flex: 1, borderRadius: '6px', fontSize: '12px' }}>REQUESTS</button>
+                        </div>
+                    </div>
+                    <div style={{ textAlign: 'center', margin: '24px 0' }}><h1 style={{ fontSize: '18px', fontWeight: 'bold', letterSpacing: '0.05em', color: 'var(--color-primary)' }}>CREATE POST</h1></div>
+                    <form onSubmit={handleSubmit} style={{ padding: '0 16px' }}>
+                        <div className="card" style={{ padding: '24px', background: '#FDF6D1', border: '1px solid rgba(0,0,0,0.05)' }}>
+                            <div className="form-group">
+                                <label className="form-label">Title / Destination</label>
+                                <input type="text" className="form-input" placeholder={category === 'run' ? 'e.g. 5k at Duke Forest' : 'e.g. Ride to Target'} value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} required />
+                            </div>
+                            <div className="form-group">
+                                <label className="form-label">Meetup Location</label>
+                                <input type="text" className="form-input" placeholder="e.g. Bryan Center, East Campus" value={form.location} onChange={(e) => setForm({ ...form, location: e.target.value })} />
+                            </div>
+                            <div className="form-group">
+                                <label className="form-label">Notes (Optional)</label>
+                                <textarea className="form-input" style={{ height: '80px', resize: 'vertical' }} placeholder="Any additional details..." value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })}></textarea>
+                            </div>
+                            <div className="form-group">
+                                <label className="form-label">Hashtags</label>
+                                <input type="text" className="form-input" placeholder="e.g. fitness, restaurants" value={form.hashtags} onChange={(e) => setForm({ ...form, hashtags: e.target.value })} />
+                            </div>
+                            <button type="submit" className="btn btn-primary btn-lg w-full mt-4" disabled={loading || !form.title}>{loading ? 'Posting...' : '🚀 Post to Community'}</button>
+                        </div>
+                    </form>
+                </div>
+            );
+        }
+
+        // ChatPage
+        function ChatPage({ chatId }) {
+            const { currentUser, getUserChats, chats, sendMessage } = useApp();
+            const messagesEndRef = useRef(null);
+            const [message, setMessage] = useState('');
+            const userChats = getUserChats();
+            const activeChat = chatId ? chats.find(c => c.id === chatId) : null;
+
+            useEffect(() => { messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' }); }, [activeChat?.messages]);
+
+            const handleSend = (e) => {
+                e.preventDefault();
+                if (!message.trim() || !activeChat) return;
+                sendMessage(activeChat.id, message.trim());
+                setMessage('');
+            };
+
+            const getOtherUser = (chat) => chat.buyerId === currentUser.id ? { name: chat.sellerName, id: chat.sellerId } : { name: chat.buyerName, id: chat.buyerId };
+
+            return (
+                <div className="main-content">
+                    <div className="chat-layout">
+                        <div className="chat-sidebar">
+                            <div className="chat-sidebar-header"><h2 className="heading-4">Messages</h2></div>
+                            <div className="chat-list">
+                                {userChats.length > 0 ? userChats.map(chat => {
+                                    const other = getOtherUser(chat);
+                                    return (
+                                        <div key={chat.id} className={`chat-item ${chat.id === chatId ? 'active' : ''}`} onClick={() => window.location.hash = `#/chat/${chat.id}`}>
+                                            <div className="chat-item-avatar">{other.name?.charAt(0)}</div>
+                                            <div className="chat-item-content">
+                                                <div className="chat-item-name">{other.name}</div>
+                                                <div className="chat-item-preview">{chat.lastMessage || chat.listingTitle || 'Start a conversation'}</div>
+                                            </div>
+                                        </div>
+                                    );
+                                }) : <div className="empty-state" style={{ padding: '32px 16px' }}><p className="text-muted">No conversations yet</p></div>}
+                            </div>
+                        </div>
+                        {activeChat ? (
+                            <div className="chat-main">
+                                <div className="chat-main-header">
+                                    <div className="chat-item-avatar">{getOtherUser(activeChat).name?.charAt(0)}</div>
+                                    <div>
+                                        <div className="chat-item-name">{getOtherUser(activeChat).name}</div>
+                                        <div className="text-small text-muted">{activeChat.listingTitle}</div>
+                                    </div>
+                                </div>
+                                <div className="chat-messages">
+                                    {activeChat.messages?.map(msg => (
+                                        <div key={msg.id} className={`chat-message ${msg.senderId === currentUser.id ? 'sent' : ''}`}>
+                                            <div className="chat-message-avatar">{msg.senderName?.charAt(0)}</div>
+                                            <div>
+                                                <div className="chat-message-bubble">{msg.content}</div>
+                                                <div className="chat-message-time">{new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
+                                            </div>
+                                        </div>
+                                    ))}
+                                    <div ref={messagesEndRef} />
+                                </div>
+                                <div className="chat-input-container">
+                                    <form className="chat-input-wrapper" onSubmit={handleSend}>
+                                        <input type="text" className="chat-input" placeholder="Type a message..." value={message} onChange={(e) => setMessage(e.target.value)} />
+                                        <button type="submit" className="btn btn-primary btn-icon" disabled={!message.trim()}><SendIcon /></button>
+                                    </form>
+                                </div>
+                            </div>
+                        ) : (
+                            <div className="chat-empty">
+                                <div className="chat-empty-icon" style={{ width: 80, height: 80, marginBottom: 16, color: '#BDBDBD' }}><ChatIcon /></div>
+                                <h3>Select a conversation</h3>
+                                <p className="text-muted">Choose a chat from the sidebar to start messaging</p>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            );
+        }
+
+        // Main App with Router
+        function App() {
+            const [route, setRoute] = useState(window.location.hash || '#/login');
+            const { currentUser } = useApp();
+
+            useEffect(() => {
+                const handleHashChange = () => setRoute(window.location.hash);
+                window.addEventListener('hashchange', handleHashChange);
+                return () => window.removeEventListener('hashchange', handleHashChange);
+            }, []);
+
+            const path = route.replace('#/', '') || 'login';
+            const [page, chatId] = path.split('/');
+
+            // Redirect logic
+            if (!currentUser && !['login', 'signup'].includes(page)) {
+                window.location.hash = '#/login';
+                return null;
+            }
+            if (currentUser && ['login', 'signup'].includes(page)) {
+                window.location.hash = '#/run';
+                return null;
+            }
+
+            const showLayout = currentUser && !['login', 'signup'].includes(page);
+
+            return (
+                <div className="app-container">
+                    {showLayout && <Header />}
+                    {showLayout && page !== 'chat' && (
+                        <main className="main-content">
+                            {page === 'run' && <RunPage />}
+                            {page === 'ride' && <RidePage />}
+                            {page === 'reuse' && <ReusePage />}
+                            {page === 'rewards' && <RewardsPage />}
+                            {page === 'publish' && <PublishPage />}
+                        </main>
+                    )}
+                    {showLayout && page === 'chat' && <ChatPage chatId={chatId} />}
+                    {!showLayout && page === 'login' && <LoginPage />}
+                    {!showLayout && page === 'signup' && <SignupPage />}
+                    {showLayout && <BottomNav currentPage={page} />}
+                    <Toast />
+                </div>
+            );
+        }
+
+        // Render
+        ReactDOM.createRoot(document.getElementById('root')).render(
+            <AppProvider>
+                <App />
+            </AppProvider>
+        );
+    </script>
+</body>
+
+</html>
